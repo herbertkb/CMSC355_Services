@@ -2,16 +2,15 @@
     Translate.java
     
     Interactive console to prompt user for an English word and return its 
-    translation. Depends on external program Dictionary.jar to perform 
-    translation with the user specified translation file. 
+    translation. Connects to external Dictionary server to lookup translations. 
     
 *******************************************************************************
     To run:
         java Translate *DictionaryIP* *port*
     
-        Enter a word to translate or CTRL-C to quit: boy
+        Enter a word to translate or !!! to quit: boy
         мальчик
-        Enter a word to translate or CTRL-C to quit: fnord
+        Enter a word to translate or !!! to quit: fnord
         FNORD not found in dictionary. 
         
     To run with audit file:

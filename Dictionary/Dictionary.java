@@ -1,22 +1,18 @@
 /******************************************************************************
     Dictionary.java
     
-    Simple program that takes an English word and a translation file as input
-    and returns the word's translation as output. 
+    Server which connects to Translate clients and returns translations to words.
+    Must be instantiated with translation file containing words and their 
+    translations.
     
     Translation file must be formated as:
     *QueryWord* *tab* *TranslatedWord*
     
 *******************************************************************************
     To run:
-        java Dictionary *englishWord* *translationFile*
-        
-    Example:
-        > java Dictionary boy English2Russian.txt
-        мальчик
-        >
-        > java Dictionary fnord Englist2Russian.txt
-        FNORD not found in translation file "English2Russian.txt". 
+        java -jar Dictionary.jar <translation file> <port>
+        or
+        java -jar Dictionary.jar <translation file> <port> <log file>
 
 *******************************************************************************
     Maintenance Log
