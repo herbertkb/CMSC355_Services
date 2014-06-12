@@ -1,0 +1,37 @@
+ToDo - Calling Executable Programs
+///////////////////////////////////////////////////////////////////////////////
+Version:	0.1
+Author:		Keith Herbert
+Date:		26 May 2014
+///////////////////////////////////////////////////////////////////////////////
+
+Add exception handling. 
+	Currently both programs declare that they throw 
+	exceptions but do nothing to deal with them. Including the sections of code
+	involving I/O into a try-catch block would be a solution.
+
+Stricter handling of arguments.
+	Test if file exists and throw errors.
+	Print help message.
+	
+Fix Windows console output for non-Latin characters. 
+	Currently it spits out gibberish to console, but prints to file correctly.
+	From what I can tell, this is a deep problem with how Windows console 
+	handles Unicode.
+	
+Architecture change from scripting model to client-server model.
+	Translate currently acts like a shell script that repeatedly calls 
+	Dictionary, which acts like	a simple Unix program. This is wasteful because
+	of the overhead from restarting a process and parsing a file on each pass
+	of the main loop.
+	Instead, Translate should only have to call Dictionary once, when it starts.
+	Dictionary can then read the translation file into memory once and use a 
+	binary search to quickly lookup words. 
+	
+Re-implement Translate as GUI
+	Besides being easier to use, this would also solve the 
+	problem with screwy output to Windows console for non-Latin characters. 
+	
+Embed Translate as an applet into a web page.
+	Party like it's 1999. 
+

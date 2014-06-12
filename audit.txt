@@ -1,0 +1,13 @@
+Enter a word to translate or !!! to quit: boy
+мальчик
+Enter a word to translate or !!! to quit: girl
+девушка
+Enter a word to translate or !!! to quit: arm
+рука
+Enter a word to translate or !!! to quit: hand
+рука
+Enter a word to translate or !!! to quit: car
+машина
+Enter a word to translate or !!! to quit: foo
+bar
+Enter a word to translate or !!! to quit: !!!
