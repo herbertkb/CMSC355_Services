@@ -37,6 +37,8 @@
 	0006	10 Jun 2014	Keith	Combined a few lines together in the loop which
 								reads the translation file. More comments for
 								main loop.
+	0007	11 Jun 2014	Keith	Transition from local daemon server to network
+								server. 
 
 
 ******************************************************************************/

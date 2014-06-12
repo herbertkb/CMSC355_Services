@@ -39,7 +39,8 @@
 								Translate is now a networked client app.
 								No longer takes wordfile as parameter.
 								Now requires IP address and port of Dictionary
-								server. 
+								server.
+	0007	12 Jun 2014	Keith	Fiddling with the try-with-resources block.
 
 ******************************************************************************/
 
@@ -85,23 +86,30 @@ public class Translate {
 		String escape = "!!!";
 		String prompt = "Enter a word to translate or " + escape + " to quit: ";
 		
-		try {
+		// auditOut must be declared outside of try block to be in scope for the
+		// finally block. 
+		PrintWriter auditOut = null;
+		
+		try (
 			/* Create objects for input and output to user console and to audit
 			// file. Unicode must be forced to override local encodings for
 			// non-Latin characters. */
 			Scanner userIn = new Scanner(System.in);
 			PrintStream userOut = new PrintStream(System.out, true, "UTF-8");
-			PrintWriter auditOut = null;
-			if (AUDIT) auditOut = new PrintWriter(auditfile);
 			
 			/* Connect to dictionary server. */
 			Socket dictSocket = new Socket( dictIP, dictPort );
 			BufferedReader dictReader = new BufferedReader( 
 				new InputStreamReader( dictSocket.getInputStream() ) );
 			PrintWriter dictLookup = new PrintWriter( 
-				dictSocket.getOutputStream(), true);
-		 
-		
+				dictSocket.getOutputStream(), true); 
+		) {
+			// auditOut instantiated outside of the try-with-resources resource
+			// block because try-with-resources doesn't work with conditional 
+			// resources.
+			if (AUDIT) auditOut = new PrintWriter(auditfile);
+			
+			
 			//	Main loop of program. ///////////////////////////////////////////
 			//	On each pass, take English word from the user, pass it to the 
 			//	Dictionary server and return the output from the server to the 
@@ -134,8 +142,11 @@ public class Translate {
 			System.out.println("Cannot connect to Dictionary server at " + dictIP);
 			System.exit(1);
 		} catch (IOException e) {
-			e.toString();
+			System.out.println( "Error communicating with Dictionary server. \n" 
+				+ e.toString() );
 			System.exit(1);
+		} finally {
+			if (AUDIT) { auditOut.close(); }
 		}
 	}
 }
