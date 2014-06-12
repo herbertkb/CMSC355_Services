@@ -20,12 +20,12 @@ Re-implement Translate as GUI
 	
 Embed Translate as an applet into a web page.
 	Party like it's 1999. 
-
-More console output for Dictionary
-	Option for logging output
 	
 ConcurrentMap for Dictionary to ease use by multiple clients.
 
-Finish Commenting
-
 Error message if server disconnects from client or if server cannot be reached.
+
+Simple method shared between Translate and Dictionary 
+	takes a string for input
+	outputs that string to StdOut and a log file. 
+	The way Dictionary currently handles logging is an eyesore.

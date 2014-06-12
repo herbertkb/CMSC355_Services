@@ -1,0 +1,5 @@
+Enter a word to translate or !!! to quit: tea
+???
+Enter a word to translate or !!! to quit: book
+?????
+Enter a word to translate or !!! to quit: !!!

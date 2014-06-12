@@ -41,6 +41,7 @@
                                 Now requires IP address and port of Dictionary
                                 server.
     0007    12 Jun 2014 Keith   Fiddling with the try-with-resources block.
+    0008    12 Jun 2014 Keith   Force Unicode for the log file. 
 
 ******************************************************************************/
 
@@ -107,7 +108,7 @@ public class Translate {
             // auditOut instantiated outside of the try-with-resources resource
             // block because try-with-resources doesn't work with conditional 
             // resources.
-            if (AUDIT) auditOut = new PrintWriter(auditfile);
+            if (AUDIT) auditOut = new PrintWriter(auditfile, "UTF-8"); //fix 0008
             
             
             //  Main loop of program. ///////////////////////////////////////////

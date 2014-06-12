@@ -88,10 +88,13 @@ public class Dictionary {
         /* as the value, represented in the translation file by two words
         /* separated by a tab.
         /*********************************************************************/
+        // Map collection to store the word and translation pairs. 
         Map<String, String> wordMap = new HashMap<String, String>();
         
+        // Open the translation file
         try (Scanner parser = new Scanner(new File(transFile), "UTF-8")) {
             
+            // Log opening the file. 
             String processedStart = new Date() + " Processing " + transFile + ".";
             System.out.println( processedStart );
             if (LOG) { 
@@ -99,11 +102,14 @@ public class Dictionary {
                 logOut.flush();
             }
             
+            // Parse the file and extract the word, translation pairs on each
+            // line into the key,value pairs of the Map. 
             while (parser.hasNextLine()) {
                 String[] fields = parser.nextLine().trim().split("\t");
                 wordMap.put(fields[0], fields[1]);
             }
            
+           // Log successful parsing. 
            String processedWin = new Date() + " " + transFile + " processed.";     
            System.out.println( processedWin );
            if (LOG) { 
@@ -111,9 +117,10 @@ public class Dictionary {
             logOut.flush();
             }
         } catch (FileNotFoundException e) {
+            
+            // Log unsuccessful parsing.
             String processedFail = new Date() + "Error reading translation file "
                 + transFile +"\n" + e.toString();
-            
             System.out.println( processedFail );
             if (LOG) { 
                 logOut.println( processedFail );
@@ -129,6 +136,7 @@ public class Dictionary {
         /*********************************************************************/
         try ( ServerSocket serverSocket = new ServerSocket( port )) {
             
+            // Log opening of socket for listening. 
             String serverStart = 
                 new Date() + " Dictionary server listening on port " + port + ".";
             System.out.println( serverStart );
@@ -137,20 +145,24 @@ public class Dictionary {
                 logOut.flush();
             }
             
+            // Tracks the number of clients and gives them an ID for logging
             int clientCount = 0;
             
             while (true) {
+                // New client connected. 
                 Socket clientSocket = serverSocket.accept();
                 clientCount++;
+                
+                // Log new client connection.
                 InetAddress clientIP = clientSocket.getInetAddress();
                 String clientHostName = clientIP.getHostName();
-                
                 String clientConnect = 
                     new Date() + " Client " + clientCount + " (" + clientHostName 
                     + ") connected.";
                 System.out.println( clientConnect );
                 logOut.println( clientConnect );
                 
+                // Start a new thread for the client. 
                 Thread client = new Thread(
                     new HandleClient(clientSocket, wordMap, clientCount));
                 client.start();
@@ -207,6 +219,7 @@ private static class HandleClient implements Runnable {
                 // Grab the word from the user.
                 String query = clientIn.readLine();
                 
+                // Log client's word
                 String clientQueryMsg = 
                     new Date() + " Client " + clientID + " query: " + query;
                 System.out.println( clientQueryMsg );
@@ -221,6 +234,7 @@ private static class HandleClient implements Runnable {
                     String translation =  wordMap.get( query.toString() );
                     clientOut.println( translation ); 
                     
+                    // Log the translation
                     String clientTransMsg = 
                         new Date() + " Client " + clientID + " translation: " +
                         translation;
@@ -237,6 +251,7 @@ private static class HandleClient implements Runnable {
                 else { 
                     clientOut.println("No translation for " + query.toUpperCase());
                     
+                    // Log not finding a translation.s
                     String queryFail = new Date() + " Client " + clientID 
                         + ": No translation for " + query.toUpperCase();
                     System.out.println(queryFail);
@@ -255,7 +270,7 @@ private static class HandleClient implements Runnable {
             }
         }
         
-        // Disconnect message.
+        // Log disconnect message.
         String disconnectMsg = new Date() + " Client " + clientID + " disconnected.";
         System.out.println( disconnectMsg );
         if (LOG) {
