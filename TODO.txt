@@ -5,7 +5,7 @@ Author:		Keith Herbert
 Date:		12 June 2014
 ///////////////////////////////////////////////////////////////////////////////
 
-Stricter handling of arguments.
+Stricter handling of command line arguments.
 	Test if file exists and throw errors.
 	Print help message.
 	
@@ -21,11 +21,11 @@ Re-implement Translate as GUI
 Embed Translate as an applet into a web page.
 	Party like it's 1999. 
 
-Smooth exiting of a Translate client without throwing exception on Dictionary.
-
 More console output for Dictionary
 	Option for logging output
 	
 ConcurrentMap for Dictionary to ease use by multiple clients.
 
 Finish Commenting
+
+Error message if server disconnects from client or if server cannot be reached.
