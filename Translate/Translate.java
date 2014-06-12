@@ -7,7 +7,7 @@
 	
 *******************************************************************************
 	To run:
-		java Translate *translationFile*
+		java Translate *DictionaryIP* *port*
 	
 		Enter a word to translate or CTRL-C to quit: boy
 		мальчик
@@ -15,7 +15,7 @@
 		FNORD not found in dictionary. 
 		
 	To run with audit file:
-		java Translate *translationFilename* *auditFilename*
+		java Translate *DictionaryIP* *port* *auditFilename*
 	
 *******************************************************************************
 	Maintenance Log
@@ -35,6 +35,11 @@
 								a minor change was complicated by a missing "\n"
 								after the word being printed to Dictionary.jar's
 								input. 
+	0006	11 Jun 2014	Keith	Branching to CMSC_Sockets. 
+								Translate is now a networked client app.
+								No longer takes wordfile as parameter.
+								Now requires IP address and port of Dictionary
+								server. 
 
 ******************************************************************************/
 
@@ -46,6 +51,9 @@ import java.io.PrintWriter;			// print to external file & Dictionary.jar
 import java.io.OutputStreamWriter;	// print to Dictionary.jar process
 import java.io.BufferedOutputStream;// print to Dictionary.jar process
 import java.io.IOException;			// lots of IO, lots of possible exceptions
+import java.net.*;
+import java.util.*;
+import java.io.*;
 
 
 public class Translate {
@@ -53,86 +61,81 @@ public class Translate {
 		throws java.io.IOException, java.io.UnsupportedEncodingException {
 		
 		//	Parse commandline arguments.///////////////////////////////////////
-		//	args[0] must be the path to the translation file.
-		//	args[1] could be a filename for an audit file (optional).
+		//	args[0] must be the IP address of the Dictionary server.
+		//	args[1] must be the port of the Dictionary server.
+		//	args[2] could be a filename for an audit file (optional).
 		//		If specified, store the filename and raise a flag to be checked
 		//		throughout the rest of the program whenever output is needed.
 		///////////////////////////////////////////////////////////////////////
-		String wordlist = args[0];
+		String dictIP = args[0];
+		int dictPort = Integer.parseInt(args[1]);
 		
 		String auditfile = null; 
 		boolean AUDIT = false;
 		
-		if (args.length == 2) {
-			auditfile = args[1];
+		if (args.length == 3) {
+			auditfile = args[2];
 			AUDIT = true;
 		}
 		
 		// Hard strings. //////////////////////////////////////////////////////
 		// escape is entered by user to end the program
 		// prompt is presented to user on every pass of main loop.
-		// command is used to call external program Dictionary.jar/////////////
+		///////////////////////////////////////////////////////////////////////
 		String escape = "!!!";
 		String prompt = "Enter a word to translate or " + escape + " to quit: ";
-		String command = "java -jar Dictionary.jar ";
 		
+		try {
+			/* Create objects for input and output to user console and to audit
+			// file. Unicode must be forced to override local encodings for
+			// non-Latin characters. */
+			Scanner userIn = new Scanner(System.in);
+			PrintStream userOut = new PrintStream(System.out, true, "UTF-8");
+			PrintWriter auditOut = null;
+			if (AUDIT) auditOut = new PrintWriter(auditfile);
+			
+			/* Connect to dictionary server. */
+			Socket dictSocket = new Socket( dictIP, dictPort );
+			BufferedReader dictReader = new BufferedReader( 
+				new InputStreamReader( dictSocket.getInputStream() ) );
+			PrintWriter dictLookup = new PrintWriter( 
+				dictSocket.getOutputStream(), true);
+		 
 		
-		// Create objects for input and output to user console and to audit file. 
-		// Unicode must be forced for all output to console.///////////////////
-		Scanner userIn = new Scanner(System.in);
-		PrintStream userOut = new PrintStream(System.out, true, "UTF-8");
-		PrintWriter auditOut = null;
-		if (AUDIT) auditOut = new PrintWriter(auditfile);
-		
-		// Run external program Dictionary.jar with command string and the
-		// translation file specified on invocation.
-		// Then, create a Writer object to give it words, a Reader object to
-		// receive translations, and an Error reader just because.
-		
-		Process proc = Runtime.getRuntime().exec( command + wordlist);
-		BufferedReader dictReader = new BufferedReader(
-			new InputStreamReader( proc.getInputStream()));
-		PrintWriter dictLookup = new PrintWriter( new OutputStreamWriter ( 
-			new BufferedOutputStream( proc.getOutputStream() ))); 
+			//	Main loop of program. ///////////////////////////////////////////
+			//	On each pass, take English word from the user, pass it to the 
+			//	Dictionary server and return the output from the server to the 
+			//	user.
+			/////////////////////////////////////////////////////////////////////
+			while( true ) {
+			
+				// Prompt user for input.//////////////////////////////////////
+				System.out.print( prompt );
+				if (AUDIT) { auditOut.print( prompt ); }
+				
+				// Store input and add to log file if specified. //////////////
+				String word = userIn.next();
+				if (AUDIT) { auditOut.println( word ); }
+				
+				// Exit loop if user entered the escape word.//////////////////
+				if (word.equals( escape )) { break; }
 
-		
-		
-		//	Main loop of program. /////////////////////////////////////////////
-		//	On each pass, take English word from the user, pass it to 
-		//	Dictionary.jar, return its translation to user.	For every output, 
-		//	print to both console and the audit file, if specified.
-		///////////////////////////////////////////////////////////////////////
-		while( true ) {
-			
-			// Prompt user for input.//////////////////////////////////////////
-			System.out.print( prompt );
-			if (AUDIT) { auditOut.print( prompt ); }
-			
-			// Store input and add to log file if specified. //////////////////
-			String word = userIn.next();
-			if (AUDIT) { auditOut.println( word ); }
-			
-			// Exit loop if user entered the escape word.//////////////////////
-			if (word.equals( escape )) { break; }
-
-			// Lookup word in Dictionary
-			dictLookup.println( word );
-			dictLookup.flush();
-			
-			// Store the translated word and output to console and audit file
-			// if specified. //////////////////////////////////////////////////
-			String transWord = dictReader.readLine();
-			userOut.println( transWord );
-			if (AUDIT) { auditOut.println( transWord ); }
+				// Lookup word in Dictionary
+				dictLookup.println( word );
+				dictLookup.flush();
+				
+				// Get the translated word and output to console and audit
+				// file if specified. /////////////////////////////////////////
+				String transWord = dictReader.readLine();
+				userOut.println( transWord );
+				if (AUDIT) { auditOut.println( transWord ); }
+			}
+		} catch (UnknownHostException e) {
+			System.out.println("Cannot connect to Dictionary server at " + dictIP);
+			System.exit(1);
+		} catch (IOException e) {
+			e.toString();
+			System.exit(1);
 		}
-		
-		// Terminate the Dictionary process now that the user loop is finished.
-		dictLookup.close();
-		dictReader.close();
-		proc.destroy();
-		
-		// Close the handle for the audit file before exiting the program./////
-		if (AUDIT) { auditOut.close(); }
-		
 	}
 }
