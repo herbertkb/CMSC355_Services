@@ -1,56 +1,44 @@
-README - Calling Executable Programs
+README - Sockets
 ///////////////////////////////////////////////////////////////////////////////
 
-Version:	0.2
+Version:	0.3
 Author:		Keith Herbert
-Date:		26 May 2014
+Date:		11 June 2014
 
 Description:
-Translate is an interactive console prompt that takes a word from the user and
-returns its translation. It requires a translation file as a command-line 
-argument and may have an audit file specified to log its output.
+Translate is an interactive console client application that takes a word from
+the user, forwards the word to an external Dictionary server and returns the 
+translation from the Dictionary server to the user. The IP address and port of 
+the Dictionary server must be specified on start up.
+If specified, it can log all input, output, and server communication to an external file.
 
-Dictionary is a program used by Translate to process the translation file and 
-lookup the translation for each word supplied by the user. 
+Dictionary is a server application which accepts connections from the Translate
+client. When given a query word, it looks up its translation and returns the 
+translation to the client. The port Dictionary listens to and a list of words
+and their translations must be provided on startup. 
+If specified, it can log all input, output, and client communications to an 
+external file. 
 
 A separate file containing the words to look up and their translations must be 
 provided. This file must have each word and its translation together on a single
 line, separated by a tab. 
 
+
 ///////////////////////////////////////////////////////////////////////////////
 
 Usage
 
-Translate.jar and Dictionary.jar must be in same directory. 
-
-> java -jar Translate.jar wordlist.txt
-Enter a word to translate or !!! to quit: boy
-мальчик
-Enter a word to translate or !!! to quit: girl
-девушка
-Enter a word to translate or !!! to quit: fnord
-FNORD not found in dictionary.
-Enter a word to translate or !!! to quit: !!!
-
->
->java -jar Dictionary.jar boy wordlist.txt
-мальчик
-
->java -jar Dictionary.jar fnord wordlist.txt
-FNORD not found in dictionary.
-
->
 
 ///////////////////////////////////////////////////////////////////////////////
 
 Compilation Instructions
 
-From CEP directory containing Translate and Dictionary directories, each 
+From a directory containing Translate and Dictionary directories, each 
 containing the java source files and the jar manifest file:
 
-CEP>javac Translate\Translate.java
-CEP>javac Dictionary\Dictionary.java
-CEP>jar vmcf Translate\MANIFEST.MF Translate.jar Translate\Translate.class
-CEP>jar vmcf Dictionary\MANIFEST.MF Dictionary.jar Dictionary\Dictionary.class
+>javac Translate\Translate.java
+>javac Dictionary\Dictionary.java
+>jar vmcf Translate\MANIFEST.MF Translate.jar Translate\Translate.class
+>jar vmcf Dictionary\MANIFEST.MF Dictionary.jar Dictionary\Dictionary.class
 
 ///////////////////////////////////////////////////////////////////////////////
