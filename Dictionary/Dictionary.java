@@ -41,6 +41,8 @@
                                 Allow logging to external file.
                                 Change tabs to spaces for github readability.
                                 Minor change to commenting style
+    0009    01 Jul 2014 Keith   Changed constructor for logOut object to simp-
+                                lify logging to external files.   
 
 ******************************************************************************/
 
@@ -54,10 +56,23 @@ import java.util.*;
 import java.io.*;
 
 public class Dictionary {
-
+    
+    /**************************************************************************
+    Global variables
+        These must be accessible to both the main method and child threads of
+        the HandleClient class. 
+    **************************************************************************/     
     private static boolean LOG = false; // flag for logging
     private static PrintWriter logOut;  // output to logfile if LOG is true
 
+
+    /**************************************************************************
+    Main method
+        Takes command line arguments for the translation file, listening port
+            and optional logging.
+        Listens for incoming client connections.
+        Starts HandleClient threads for each connecting client.
+    **************************************************************************/
     public static void main(String[] args) 
         throws java.io.FileNotFoundException, 
                java.io.UnsupportedEncodingException {
@@ -73,8 +88,11 @@ public class Dictionary {
         
         if (args.length == 3) {
             String logfile = args[2];
-            LOG = true;
-            logOut = new PrintWriter(logfile, "UTF-8");
+            LOG = true;     // Enable logging for rest of program and all threads.
+            
+            // FIX0009: Initialize the logging object.
+            // FileOutStream constructor used for its autoflushing ability.
+            logOut = new PrintWriter(new FileOutputStream(logfile), true);
         }
         
         
@@ -93,10 +111,7 @@ public class Dictionary {
             // Log opening the file. 
             String processedStart = new Date() + " Processing " + transFile + ".";
             System.out.println( processedStart );
-            if (LOG) { 
-                logOut.println( processedStart ); 
-                logOut.flush();
-            }
+            if (LOG) { logOut.println( processedStart ); }
             
             // Parse the file and extract the word, translation pairs on each
             // line into the key,value pairs of the Map. 
@@ -108,20 +123,14 @@ public class Dictionary {
            // Log successful parsing. 
            String processedWin = new Date() + " " + transFile + " processed.";     
            System.out.println( processedWin );
-           if (LOG) { 
-            logOut.println( processedWin ); 
-            logOut.flush();
-            }
+           if (LOG) { logOut.println( processedWin ); }
         } catch (FileNotFoundException e) {
             
             // Log unsuccessful parsing.
             String processedFail = new Date() + "Error reading translation file "
                 + transFile +"\n" + e.toString();
             System.out.println( processedFail );
-            if (LOG) { 
-                logOut.println( processedFail );
-                logOut.flush();
-            }
+            if (LOG) { logOut.println( processedFail ); }
             
         }
         
@@ -136,10 +145,7 @@ public class Dictionary {
             String serverStart = 
                 new Date() + " Dictionary server listening on port " + port + ".";
             System.out.println( serverStart );
-            if (LOG) {
-                logOut.println( serverStart );
-                logOut.flush();
-            }
+            if (LOG) { logOut.println( serverStart ); }
             
             // Tracks the number of clients and gives them an ID for logging
             int clientCount = 0;
@@ -149,14 +155,16 @@ public class Dictionary {
                 Socket clientSocket = serverSocket.accept();
                 clientCount++;
                 
-                // Log new client connection.
+                // Log new client connection. {} to narrow scope of temp variables
+                {
                 InetAddress clientIP = clientSocket.getInetAddress();
                 String clientHostName = clientIP.getHostName();
-                String clientConnect = 
+                String clientConnected = 
                     new Date() + " Client " + clientCount + " (" + clientHostName 
                     + ") connected.";
-                System.out.println( clientConnect );
-                logOut.println( clientConnect );
+                System.out.println( clientConnected );
+                logOut.println( clientConnected ); 
+                }
                 
                 // Start a new thread for the client. 
                 Thread client = new Thread(
@@ -219,10 +227,7 @@ private static class HandleClient implements Runnable {
                 String clientQueryMsg = 
                     new Date() + " Client " + clientID + " query: " + query;
                 System.out.println( clientQueryMsg );
-                if (LOG) {
-                    logOut.println( clientQueryMsg );
-                    logOut.flush();
-                }
+                if (LOG) { logOut.println( clientQueryMsg ); }
                 
                 // Look the word up and return translation to client.
                 if (wordMap.containsKey( query )) {
@@ -235,10 +240,7 @@ private static class HandleClient implements Runnable {
                         new Date() + " Client " + clientID + " translation: " +
                         translation;
                     System.out.println( clientTransMsg );
-                    if (LOG) {
-                        logOut.println( clientTransMsg );
-                        logOut.flush();
-                    }
+                    if (LOG) { logOut.println( clientTransMsg ); }
                 }
                 // null if client has disconnected. End the loop.
                 else if (query == null ) { break; }
@@ -251,28 +253,19 @@ private static class HandleClient implements Runnable {
                     String queryFail = new Date() + " Client " + clientID 
                         + ": No translation for " + query.toUpperCase();
                     System.out.println(queryFail);
-                    if (LOG) {
-                        logOut.println(queryFail);
-                        logOut.flush();
-                    }
+                    if (LOG) { logOut.println(queryFail); }
                 }
             }
             
         } catch (IOException e) { 
             System.out.println(e); 
-            if (LOG) { 
-                logOut.println(e);
-                logOut.flush();
-            }
+            if (LOG) { logOut.println(e); }
         }
         
         // Log disconnect message.
         String disconnectMsg = new Date() + " Client " + clientID + " disconnected.";
         System.out.println( disconnectMsg );
-        if (LOG) {
-            logOut.println(disconnectMsg);
-            logOut.flush();
-        }
+        if (LOG) { logOut.println(disconnectMsg); }
     }
 } // end HandleClient class
 
