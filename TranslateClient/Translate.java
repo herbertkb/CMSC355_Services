@@ -41,6 +41,8 @@
                                 server.
     0007    12 Jun 2014 Keith   Fiddling with the try-with-resources block.
     0008    12 Jun 2014 Keith   Force Unicode for the log file. 
+    0009    04 Jul 2014 Keith   ServiceCode string added to work with  
+                                EnterpiseServiceBus.
 
 ******************************************************************************/
 
@@ -82,9 +84,13 @@ public class Translate {
         // Hard strings. //////////////////////////////////////////////////////
         // escape is entered by user to end the program
         // prompt is presented to user on every pass of main loop.
+        // Fix0009
+        // serviceCode specifies Dictionary service and language to the 
+        // EnterpriseServiceBus.
         ///////////////////////////////////////////////////////////////////////
         String escape = "!!!";
         String prompt = "Enter a word to translate or " + escape + " to quit: ";
+        String serviceCode = "RUSSIAN_DICT";
         
         // auditOut must be declared outside of try block to be in scope for the
         // finally block. 
@@ -109,14 +115,17 @@ public class Translate {
             // resources.
             if (AUDIT) auditOut = new PrintWriter(auditfile, "UTF-8"); //fix 0008
             
-            
-            //  Main loop of program. ///////////////////////////////////////////
+            //  Main loop of program. /////////////////////////////////////////
             //  On each pass, take English word from the user, pass it to the 
             //  Dictionary server and return the output from the server to the 
             //  user.
-            /////////////////////////////////////////////////////////////////////
+            ///////////////////////////////////////////////////////////////////
             while( true ) {
             
+                // Fix0009 - ServiceCode string to specify Dictionary service
+                // from the EnterpriseServiceBus
+                dictLookup.println( serviceCode );
+
                 // Prompt user for input.//////////////////////////////////////
                 System.out.print( prompt );
                 if (AUDIT) { auditOut.print( prompt ); }

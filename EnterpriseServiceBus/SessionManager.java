@@ -12,23 +12,20 @@
     Source copied from Dictionary.java and cut down to just the client thread.  
 
 ******************************************************************************/
-package EnterpriseServiceBus;
+//package EnterpriseServiceBus;
 
 import java.net.*;
 import java.util.*;
 import java.io.*;
-
-
-
-/******************************************************************************
-/* SessionManager - inner class required to create runnable threads.
-/* Having each client on its own thread allows the Dictionary server to handle
-/* many clients at once. 
-/*****************************************************************************/    
+    
 class SessionManager implements Runnable {
     
     private Socket socket;      // the socket for the client connection.
     private int clientID;       // ID# for client. Useful for logging.
+    
+    // Hard strings
+    private String serviceFile = "services.txt";
+    private String callServiceBroker = "java -jar ServiceBroker.jar ";
     
     // Constructor
     public SessionManager(Socket socket, int clientID ) {
@@ -59,14 +56,86 @@ class SessionManager implements Runnable {
         /* Forward the client's parameters to the service and return result to
         /*  client.
         /*********************************************************************/
-            while ( true ) {
-                // write code        
+            String previousService = "";
+            Socket serviceSocket = null;
+	        while ( true ) {
+		        
+		        // Read in the serviceCode from the client and check if its the
+                // same as the last.
+		        String currentService = clientIn.readLine();
+		        System.out.println(
+		            new Date() + "Client " + clientID +  "requests " + currentService);                
+
+                if (!currentService.equals( previousService )) {
+                    
+                    serviceSocket = connectService(currentService);
+
+
+                    previousService = currentService;               
+                }
+                
+                
+                // Open I/O handles to the service
+                BufferedReader serviceReader = new BufferedReader( 
+                                            new InputStreamReader( 
+                                            serviceSocket.getInputStream() ) );
+                PrintWriter serviceWriter = new PrintWriter( 
+                                            serviceSocket.getOutputStream(), true); 
+                
+                // Pass input from client to the service
+                serviceWriter.println( clientIn.readLine() );
+                
+                // Pass output from the service to the client.
+                clientOut.println( serviceReader.readLine() );
+                
+       
             }
-       } catch (IOException ioe) {}
+       } catch (IOException ioe) { System.err.println( ioe.toString() ); }
         
         // Log disconnect message.
         //String disconnectMsg = new Date() + " Client " + clientID + " disconnected.";
         //System.out.println( disconnectMsg );
         
     } // end run()
+    
+    /**************************************************************************
+    /*  callServiceBroker
+    /*  Input:  the service code supplied by the client
+    /*  Output: A socket object constructed with the ip address and port of the 
+    /*          server providing the service requested.
+    /*          null if unsuccessful. 
+    /*************************************************************************/
+    
+    private Socket connectService(String clientService) {
+        try {
+        
+            // Setup the external call of ServiceBroker    
+            ProcessBuilder builder = new ProcessBuilder( 
+                callServiceBroker, serviceFile, clientService );
+            
+            final Process process = builder.start();
+            BufferedReader serviceBrokerOut =   new BufferedReader( 
+                                                new InputStreamReader( 
+                                                process.getInputStream() ));
+                                            
+            // ServiceBroker prints the hostname and port on seperate lines.
+            String hostname = serviceBrokerOut.readLine();
+            int port = Integer.parseInt( serviceBrokerOut.readLine() );
+            
+            serviceBrokerOut.close();
+            
+            
+            Socket service = new Socket(hostname, port);
+            
+            return service;
+            
+        } catch (IOException ioe) { 
+            System.err.println( ioe.toString() );
+        }
+        
+        return null;
+         
+    } // end callServiceBroker method
+    
+    
 } // end SessionManager class 
