@@ -1,32 +1,35 @@
 /******************************************************************************
     ServiceManager.java
   
-    DESCIPTION GOES HERE
-    
-*******************************************************************************
-    To run:
-
-
+    Component class of EnterpriseServiceBus.jar.
+    Accepts client connections and starts a SessionManager thread for each
+    client.
+    Prints status for connecting clients to standard output.
+     
 *******************************************************************************
     Maintenance Log
     
     Fix#0001    2 Jul 2014  Keith Herbert
     Source copied from Dictionary.java and cut down to just the server.
     
+    Fix 0002    7 Jul 2014  Keith Herbert
+    More specific imports.
+    
 
 ******************************************************************************/
 
-//package EnterpriseServiceBus;
 
-import java.net.*;
-import java.util.*;
-import java.io.*;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.InetAddress;
+import java.util.Date;
+import java.io.IOException;
 
 public class ServiceManager {
     
     /**************************************************************************
     *   Main method:
-    *   Listens for incoming client connections.
+    *   Listens for incoming client connections on port from CL argument. 
     *   Starts SessionManager threads for each connecting client.
     **************************************************************************/
     public static void main(String[] args) {

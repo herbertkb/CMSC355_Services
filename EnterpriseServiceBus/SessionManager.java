@@ -60,11 +60,20 @@ class SessionManager implements Runnable {
             Socket serviceSocket = null;
 	        while ( true ) {
 		        
-		        // Read in the serviceCode from the client and check if its the
-                // same as the last.
+		        // Read in the serviceCode from the client.
 		        String currentService = clientIn.readLine();
+		        
+		        // If the client returns null, then it has disconnected. 
+		        if (currentService == null ) { 
+		            System.out.println(new Date() + " Client" + clientID + " disconnected.");
+		            break;    
+		        } 		        
+		        
 		        System.out.println(
-		            new Date() + " Client" + clientID +  " requests " + currentService);                
+		            new Date() + " Client" + clientID +  " requests " + currentService);
+		            
+		            
+               
 
                 if (!currentService.equals( previousService )) {
                     
@@ -89,9 +98,10 @@ class SessionManager implements Runnable {
                     new Date() + "Client" + clientID + " input: " + clientInput );  
                 
                 // Pass output from the service to the client.
-                String serviceOutput 
-                clientOut.println( serviceReader.readLine() );
-                
+                String serviceOutput = serviceReader.readLine(); 
+                clientOut.println( serviceOutput );
+                System.out.println(
+                    new Date() + currentService + " output: " + serviceOutput );
        
             }
        } catch (IOException ioe) { System.err.println( ioe.toString() ); }
