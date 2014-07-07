@@ -1,6 +1,8 @@
 #   services.txt
 #   SERVICE_CODE *tab* HOSTNAME *tab* PORT
+#
+#	Make sure you have tabs and not spaces!
 
-FRENCH_DICT localhost   8001
-RUSSIAN_DICT    localhost  8000
-TRANSLITERATE_CYRILLIC  localhost   8002
+FRENCH_DICT	localhost	8001
+RUSSIAN_DICT	localhost	8000
+TRANSLITERATE_CYRILLIC	localhost	8002
