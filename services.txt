@@ -1,3 +1,6 @@
-FRENCH_DICT,localhost,8001
-RUSSIAN_DICT,localhost,8000
-TRANSLITERATE_CYRILLIC,localhost,8002
+#   services.txt
+#   SERVICE_CODE *tab* HOSTNAME *tab* PORT
+
+FRENCH_DICT localhost   8001
+RUSSIAN_DICT    localhost  8000
+TRANSLITERATE_CYRILLIC  localhost   8002
