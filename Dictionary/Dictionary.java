@@ -158,12 +158,10 @@ public class Dictionary {
                 // Log new client connection. {} to narrow scope of temp variables
                 {
                 InetAddress clientIP = clientSocket.getInetAddress();
-                String clientHostName = clientIP.getHostName();
-                String clientConnected = 
-                    new Date() + " Client " + clientCount + " (" + clientHostName 
-                    + ") connected.";
+                //String clientHostName = clientIP.getHostName();
+                String clientConnected = new Date() + " Client" + clientCount + " " + clientIP + " connected.";
                 System.out.println( clientConnected );
-                logOut.println( clientConnected ); 
+                //logOut.println( clientConnected ); 
                 }
                 
                 // Start a new thread for the client. 

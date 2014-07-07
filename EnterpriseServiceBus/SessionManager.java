@@ -24,8 +24,8 @@ class SessionManager implements Runnable {
     private int clientID;       // ID# for client. Useful for logging.
     
     // Hard strings
-    private String serviceFile = "services.txt";
-    private String callServiceBroker = "java -jar ServiceBroker.jar ";
+    //private String serviceFile = "services.txt";
+    //private String callServiceBroker = "java -jar ServiceBroker.jar ";
     
     // Constructor
     public SessionManager(Socket socket, int clientID ) {
@@ -64,7 +64,7 @@ class SessionManager implements Runnable {
                 // same as the last.
 		        String currentService = clientIn.readLine();
 		        System.out.println(
-		            new Date() + "Client " + clientID +  "requests " + currentService);                
+		            new Date() + " Client" + clientID +  " requests " + currentService);                
 
                 if (!currentService.equals( previousService )) {
                     
@@ -83,9 +83,13 @@ class SessionManager implements Runnable {
                                             serviceSocket.getOutputStream(), true); 
                 
                 // Pass input from client to the service
-                serviceWriter.println( clientIn.readLine() );
+                String clientInput = clientIn.readLine();
+                serviceWriter.println( clientInput );
+                System.out.println(
+                    new Date() + "Client" + clientID + " input: " + clientInput );  
                 
                 // Pass output from the service to the client.
+                String serviceOutput 
                 clientOut.println( serviceReader.readLine() );
                 
        
@@ -106,12 +110,12 @@ class SessionManager implements Runnable {
     /*          null if unsuccessful. 
     /*************************************************************************/
     
-    private Socket connectService(String clientService) {
+    private static Socket connectService(String clientService) {
         try {
         
             // Setup the external call of ServiceBroker    
             ProcessBuilder builder = new ProcessBuilder( 
-                callServiceBroker, serviceFile, clientService );
+                "java", "-jar", "ServiceBroker.jar", "services.txt", clientService );
             
             final Process process = builder.start();
             BufferedReader serviceBrokerOut =   new BufferedReader( 
