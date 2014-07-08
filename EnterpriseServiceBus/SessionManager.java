@@ -1,18 +1,21 @@
 /******************************************************************************
     SessionManager.java
+    Component class of EnterpriseServiceBus.
     
-    
-*******************************************************************************
-    To run:
 
 *******************************************************************************
     Maintenance Log
-    Fix #   Date        Name    Description
-    Fix#0001    2 Jul 2014  Keith Herbert
-    Source copied from Dictionary.java and cut down to just the client thread.  
+    Fix 0001    2 Jul 2014  Keith Herbert
+    Source copied from Dictionary.java and cut down to just the client thread. 
+    
+    Fix 0002    4 Jul 2014  Keith Herbert
+    Fleshed out to mostly working state.
+    
+    Fix 0003    7 Jul 2014 Keith Herbert
+    Fixed crashing from ProcessBuilder. Worked fine for awhile but small changes
+    made it crash again. 
 
 ******************************************************************************/
-//package EnterpriseServiceBus;
 
 import java.net.*;
 import java.util.*;
@@ -24,8 +27,7 @@ class SessionManager implements Runnable {
     private int clientID;       // ID# for client. Useful for logging.
     
     // Hard strings
-    //private String serviceFile = "services.txt";
-    //private String callServiceBroker = "java -jar ServiceBroker.jar ";
+    private final String serviceFile = "services.txt";
     
     // Constructor
     public SessionManager(Socket socket, int clientID ) {
@@ -49,7 +51,7 @@ class SessionManager implements Runnable {
         ) {
         
         /** *******************************************************************
-        /* Main loop
+        /* Primary loop
   	    /* Parse requested service from client.
 	    /* If a new service, call ServiceBroker for command string to use the 
         /*  requested service.
@@ -62,24 +64,23 @@ class SessionManager implements Runnable {
 		        
 		        // Read in the serviceCode from the client.
 		        String currentService = clientIn.readLine();
-		        
-		        // If the client returns null, then it has disconnected. 
+		        System.out.println(
+		            new Date() + " Client" + clientID +  " requests " 
+		            + currentService);
+		            
+		        // If the client returns null, then it has disconnected.
+		        // Exit the loop and end the session. 
 		        if (currentService == null ) { 
-		            System.out.println(new Date() + " Client" + clientID + " disconnected.");
+		            System.out.println(
+		                new Date() + " Client" + clientID + " disconnected.");
 		            break;    
 		        } 		        
 		        
-		        System.out.println(
-		            new Date() + " Client" + clientID +  " requests " + currentService);
-		            
-		            
-               
-
+		        // If the client requests a different service than before,
+		        // or is requesting for the first time, then use 
+		        // connectService() to return a socket to connect to the service. 
                 if (!currentService.equals( previousService )) {
-                    
-                    serviceSocket = connectService(currentService);
-
-
+                    serviceSocket = connectService( currentService );
                     previousService = currentService;               
                 }
                 
@@ -91,7 +92,7 @@ class SessionManager implements Runnable {
                 PrintWriter serviceWriter = new PrintWriter( 
                                             serviceSocket.getOutputStream(), true); 
                 
-                // Pass input from client to the service
+                // Pass input from client to the service.
                 String clientInput = clientIn.readLine();
                 serviceWriter.println( clientInput );
                 System.out.println(
@@ -106,10 +107,6 @@ class SessionManager implements Runnable {
             }
        } catch (IOException ioe) { System.err.println( ioe.toString() ); }
         
-        // Log disconnect message.
-        //String disconnectMsg = new Date() + " Client " + clientID + " disconnected.";
-        //System.out.println( disconnectMsg );
-        
     } // end run()
     
     /**************************************************************************
@@ -120,12 +117,12 @@ class SessionManager implements Runnable {
     /*          null if unsuccessful. 
     /*************************************************************************/
     
-    private static Socket connectService(String clientService) {
-        try {
-        
+    private Socket connectService(String clientService) {
+        try {            
+
             // Setup the external call of ServiceBroker    
             ProcessBuilder builder = new ProcessBuilder( 
-                "java", "-jar", "ServiceBroker.jar", "services.txt", clientService );
+                "java", "-jar", "ServiceBroker.jar", serviceFile, clientService );
             
             final Process process = builder.start();
             BufferedReader serviceBrokerOut =   new BufferedReader( 
@@ -136,17 +133,22 @@ class SessionManager implements Runnable {
             String hostname = serviceBrokerOut.readLine();
             int port = Integer.parseInt( serviceBrokerOut.readLine() );
             
+            System.out.println(
+                new Date() + " " clientService + " at " + hostname + " port " + port);  
+            
+            // Stop reading from ServiceBroker.
             serviceBrokerOut.close();
             
-            
+            // Make a socket from the hostname and port provided by
+            // ServiceBroker and return it.
             Socket service = new Socket(hostname, port);
-            
             return service;
             
         } catch (IOException ioe) { 
             System.err.println( ioe.toString() );
         }
         
+        // Return null in the event of failure.
         return null;
          
     } // end callServiceBroker method

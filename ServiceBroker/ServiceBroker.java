@@ -19,7 +19,9 @@
     Fix #   Date        Name    Description
     0001    02 Jul 2014 Keith   First draft.
     0002    07 Jul 2014 Keith   Comments, both in this file and enabled for 
-                                service file.        
+                                service file.
+    0003    07 Jul 2014 Keith   Bug fix for skipping line bug after comments
+                                enabled. Forgot to change string variable split()        
 
 ******************************************************************************/
 
@@ -63,7 +65,7 @@ public class ServiceBroker {
                 // fields[0] is SERVICE_CODE.
                 // fields[1] is HOSTNAME.
                 // fields[2] is PORT.
-                String[] fields = reader.nextLine().split("\t");
+                String[] fields = line.split("\t");
                 
                 // On a match, assign the hostname and port and exit the loop.
                 if ( fields[0].equals( serviceCode ) ) {

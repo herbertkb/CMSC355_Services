@@ -12,18 +12,20 @@
     Fix#0001    2 Jul 2014  Keith Herbert
     Source copied from Dictionary.java and cut down to just the server.
     
-    Fix 0002    7 Jul 2014  Keith Herbert
-    More specific imports.
+    Fix 0002    4 Jul 2014  Keith Herbert
+    Fleshed out.
+    
+    Fix 0003    7 Jul 2014  Keith Herbert
+    Imports narrowed down, comments added, and minor trimmings.
     
 
 ******************************************************************************/
 
-
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.InetAddress;
-import java.util.Date;
-import java.io.IOException;
+import java.net.ServerSocket;   // Listens for incoming connections.
+import java.net.Socket;         // Connection for each new client.
+import java.net.InetAddress;    // Used for logging.
+import java.util.Date;          // Used for logging.
+import java.io.IOException;     // Handle network issues gracefully.
 
 public class ServiceManager {
     

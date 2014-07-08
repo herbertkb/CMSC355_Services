@@ -3,6 +3,7 @@
 #
 #	Make sure you have tabs and not spaces!
 
-FRENCH_DICT	localhost	8001
-RUSSIAN_DICT	localhost	8000
+FRENCH_DICT	localhost	8003
+RUSSIAN_DICT	localhost	8001
 TRANSLITERATE_CYRILLIC	localhost	8002
+stubb	localhost	8004
