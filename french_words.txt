@@ -1,0 +1,13 @@
+be	etre
+have	avoir
+I	je
+of	de
+from	de
+not	ne
+and	et
+go	aller
+make	faire
+boy	garçon
+girl	fille
+cat	chat
+dog	chien

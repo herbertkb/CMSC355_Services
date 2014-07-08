@@ -1,0 +1,16 @@
+boy	мальчик
+girl	девушка
+computer	компьютер
+program	программа
+dictionary	словарь
+translation	перевод
+cat	кошка
+dog	собака
+coffee	кофе
+tea	чай
+car	машина
+backpack	рюкзак
+book	книга
+arm	рука
+hand	рука
+foo	bar

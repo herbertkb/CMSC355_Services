@@ -84,6 +84,17 @@ class SessionManager implements Runnable {
                     previousService = currentService;               
                 }
                 
+                // If the service socket is null, then it was not connected.
+                // Service is unavailable.
+                // Send message to client and go to next service request.
+                if (serviceSocket == null) {
+                    System.out.println( 
+                        new Date() + " " + currentService + " unavailable.");
+                    clientOut.println( currentService + " unavailable.");
+                    
+                    continue;    // Process the next service request.
+                }
+                
                 
                 // Open I/O handles to the service
                 BufferedReader serviceReader = new BufferedReader( 
@@ -133,8 +144,10 @@ class SessionManager implements Runnable {
             String hostname = serviceBrokerOut.readLine();
             int port = Integer.parseInt( serviceBrokerOut.readLine() );
             
+            // <date> SERVICECODE at <hostname> port <number>
             System.out.println(
-                new Date() + " " clientService + " at " + hostname + " port " + port);  
+                new Date() + " " + clientService + " at " 
+                + hostname + " port " + port);  
             
             // Stop reading from ServiceBroker.
             serviceBrokerOut.close();

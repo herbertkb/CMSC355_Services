@@ -1,9 +1,6 @@
-# recompile.sh
+#!/bin/bash
 
-for folder in $(find . -type d -maxdepth 1 -not -name .git)
-do
-    echo $folder
-    javac *.java
-    jar vmcf MANFIEST.MF "$folder".jar *.class
-    cp "$folder".jar ..
-done
+# ESB
+javac EnterpriseServiceBus/*.java
+jar vmcf MANIFEST.MF EnterpriseServiceBus.jar EnterpriseServiceBus/*.class 
+
